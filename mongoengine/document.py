@@ -461,7 +461,14 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
 
         Helper method, should only be used inside save().
         """
-        collection = self._get_collection()
+        doc_alias = None
+        if doc.get('properties',{}).get('db_alias', None):
+            doc_alias = doc['properties']['db_alias']
+        if doc_alias:
+            alias_db = get_db(doc_alias)
+            collection = alias_db.get_collection(self._meta['collection'])
+        else:
+            collection = self._get_collection()
         with set_write_concern(collection, write_concern) as wc_collection:
             if force_insert:
                 return wc_collection.insert_one(doc).inserted_id
@@ -498,7 +505,14 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
 
         Helper method, should only be used inside save().
         """
-        collection = self._get_collection()
+        doc_alias = None
+        if doc.get('properties',{}).get('db_alias', None):
+            doc_alias = doc['properties']['db_alias']
+        if doc_alias:
+            alias_db = get_db(doc_alias)
+            collection = alias_db.get_collection(self._meta['collection'])
+        else:
+            collection = self._get_collection()
         object_id = doc["_id"]
         created = False
 
