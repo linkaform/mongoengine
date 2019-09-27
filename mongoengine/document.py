@@ -184,8 +184,10 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
         return hash(self.pk)
 
     @classmethod
-    def _get_db(cls):
+    def _get_db(cls, db_alias=None):
         """Some Model using other db_alias"""
+        if db_alias:
+            return get_db(db_alias)
         return get_db(cls._meta.get("db_alias", DEFAULT_CONNECTION_NAME))
 
     @classmethod
@@ -216,6 +218,37 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
             # set to False.
             # Also there is no need to ensure indexes on slave.
             db = cls._get_db()
+            if cls._meta.get("auto_create_index", True) and db.client.is_primary:
+                cls.ensure_indexes()
+
+        return cls._collection
+
+    @classmethod
+    def _get_collection_alias(cls, db_alias=None):
+        """Return the PyMongo collection corresponding to this document.
+
+        Upon first call, this method:
+        1. Initializes a :class:`~pymongo.collection.Collection` corresponding
+           to this document.
+        2. Creates indexes defined in this document's :attr:`meta` dictionary.
+           This happens only if `auto_create_index` is True.
+        """
+        new_alias = cls._meta.get("db_alias", DEFAULT_CONNECTION_NAME)
+        if db_alias:
+            new_alias = db_alias
+        if not hasattr(cls, "_collection") or cls._collection is None:
+            # Get the collection, either capped or regular.
+            if cls._meta.get("max_size") or cls._meta.get("max_documents"):
+                cls._collection = cls._get_capped_collection()
+            else:
+                db = cls._get_db(new_alias)
+                collection_name = cls._get_collection_name()
+                cls._collection = db[collection_name]
+
+            # Ensure indexes on the collection unless auto_create_index was
+            # set to False.
+            # Also there is no need to ensure indexes on slave.
+            db = cls._get_db(new_alias)
             if cls._meta.get("auto_create_index", True) and db.client.is_primary:
                 cls.ensure_indexes()
 

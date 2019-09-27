@@ -42,7 +42,7 @@ class switch_db(object):
         :param db_alias: the name of the specific database to use
         """
         self.cls = cls
-        self.collection = cls._get_collection()
+        self.collection = cls._get_collection_alias(db_alias)
         self.db_alias = db_alias
         self.ori_db_alias = cls._meta.get("db_alias", DEFAULT_CONNECTION_NAME)
 
@@ -56,7 +56,6 @@ class switch_db(object):
         """Reset the db_alias and collection."""
         self.cls._meta["db_alias"] = self.ori_db_alias
         self.cls._collection = self.collection
-
 
 class switch_collection(object):
     """switch_collection alias context manager.
