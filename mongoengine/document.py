@@ -496,7 +496,7 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
         """
         doc_alias = None
         if doc.get('properties',{}).get('db_alias', None):
-            doc_alias = doc['properties']['db_alias']
+            doc_alias = doc['properties'].pop('db_alias')
         if doc_alias:
             alias_db = get_db(doc_alias)
             collection = alias_db.get_collection(self._meta['collection'])
@@ -540,7 +540,7 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
         """
         doc_alias = None
         if doc.get('properties',{}).get('db_alias', None):
-            doc_alias = doc['properties']['db_alias']
+            doc_alias = doc['properties'].pop('db_alias')
         if doc_alias:
             alias_db = get_db(doc_alias)
             collection = alias_db.get_collection(self._meta['collection'])
