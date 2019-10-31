@@ -18,7 +18,12 @@ from mongoengine.base import (
     get_document,
 )
 from mongoengine.common import _import_class
-from mongoengine.connection import DEFAULT_CONNECTION_NAME, get_db
+from mongoengine.connection import (
+    DEFAULT_CONNECTION_NAME, 
+    get_db, 
+    _connection_settings,
+    register_connection
+)
 from mongoengine.context_managers import set_write_concern, switch_collection, switch_db
 from mongoengine.errors import (
     InvalidDocumentError,
@@ -533,6 +538,36 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
 
         return update_doc
 
+    def verify_connection_setting(self, alias, conn_properites):
+        if alias in _connection_settings:
+            return True
+            alias,
+            db=None,
+            name=None,
+            host=None,
+            port=None,
+            read_preference=READ_PREFERENCE,
+            username=None,
+            password=None,
+            authentication_source=None,
+            authentication_mechanism=None,
+            **kwargs
+        register_connection(
+            alias,
+            db=conn_properites.get('db'),
+            name=conn_properites.get('name'),
+            host=conn_properites.get('host'),
+            port=conn_properites.get('port'),
+            read_preference=READ_PREFERENCE,
+            username=conn_properites.get('username'),
+            password=conn_properites.get('password'),
+            authentication_source=conn_properites.get('authentication_source'),
+            authentication_mechanism=conn_properites.get('authentication_mechanism'),
+            conn_properites.get('kwargs',{})
+            )
+
+
+
     def _save_update(self, doc, save_condition, write_concern):
         """Update an existing document.
 
@@ -541,6 +576,10 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
         doc_alias = None
         if doc.get('properties',{}).get('db_alias', None):
             doc_alias = doc['properties'].pop('db_alias')
+            if  doc.get('properties',{}).get('conn_settings', {}):
+               connection_properites = doc['properties'].pop('conn_settings')
+               verify_connection_setting(doc_alias, connection_properites)
+
         if doc_alias:
             alias_db = get_db(doc_alias)
             collection = alias_db.get_collection(self._meta['collection'])
