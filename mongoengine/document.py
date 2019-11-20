@@ -541,17 +541,6 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
     def verify_connection_setting(self, alias, conn_properites):
         if alias in _connection_settings:
             return True
-            alias,
-            db=None,
-            name=None,
-            host=None,
-            port=None,
-            read_preference=READ_PREFERENCE,
-            username=None,
-            password=None,
-            authentication_source=None,
-            authentication_mechanism=None,
-            **kwargs
         register_connection(
             alias,
             db=conn_properites.get('db'),
