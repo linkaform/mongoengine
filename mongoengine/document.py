@@ -552,7 +552,7 @@ class Document(six.with_metaclass(TopLevelDocumentMetaclass, BaseDocument)):
             password=conn_properites.get('password'),
             authentication_source=conn_properites.get('authentication_source'),
             authentication_mechanism=conn_properites.get('authentication_mechanism'),
-            conn_properites.get('kwargs',{})
+            kwargs=conn_properites.get('kwargs',{})
             )
 
 
