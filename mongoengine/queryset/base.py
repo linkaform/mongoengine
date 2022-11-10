@@ -394,7 +394,7 @@ class BaseQuerySet(object):
         """
         if self._limit == 0 and with_limit_and_skip is False or self._none:
             return 0
-        count = self._cursor.count(with_limit_and_skip=with_limit_and_skip)
+        count = self._cursor.count_documents(with_limit_and_skip=with_limit_and_skip)
         self._cursor_obj = None
         return count
 
