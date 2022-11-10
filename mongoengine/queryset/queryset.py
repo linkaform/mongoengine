@@ -143,10 +143,10 @@ class QuerySet(BaseQuerySet):
             getting the count
         """
         if with_limit_and_skip is False:
-            return super(QuerySet, self).count(with_limit_and_skip)
+            return super(QuerySet, self).count_documents(with_limit_and_skip)
 
         if self._len is None:
-            self._len = super(QuerySet, self).count(with_limit_and_skip)
+            self._len = super(QuerySet, self).count_documents(with_limit_and_skip)
 
         return self._len
 
