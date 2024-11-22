@@ -676,7 +676,7 @@ class BaseDocument(object):
 
             # remove conn_settings from the SON if it's in it and it's None
             if "properties" in set_data:
-                if "conn_settings" and set_data["properties"]:
+                if "conn_settings" in set_data["properties"]:
                     del set_data["properties"]["conn_settings"]
 
         # Determine if any changed items were actually unset.
