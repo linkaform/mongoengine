@@ -393,6 +393,11 @@ class BaseDocument(object):
         if not self._meta.get("allow_inheritance"):
             data.pop("_cls")
 
+        # remove conn_settings from the SON if it's in it and it's None
+        if "properties" in data:
+            if "conn_settings" in data["properties"]:
+                del data["properties"]["conn_settings"]
+
         return data
 
     def validate(self, clean=True):
@@ -668,6 +673,11 @@ class BaseDocument(object):
             set_data = doc
             if "_id" in set_data:
                 del set_data["_id"]
+
+            # remove conn_settings from the SON if it's in it and it's None
+            if "properties" in set_data:
+                if "conn_settings" and set_data["properties"]:
+                    del set_data["properties"]["conn_settings"]
 
         # Determine if any changed items were actually unset.
         for path, value in set_data.items():
